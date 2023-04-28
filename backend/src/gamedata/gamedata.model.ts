@@ -9,6 +9,7 @@ export class Game {
 export class GameData {
     constructor(
         public name: string,
+        public desc: string,
         public releaseDate: string,
         public seriesX: boolean,
         public xbOne: boolean,

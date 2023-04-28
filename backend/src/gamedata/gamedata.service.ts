@@ -22,42 +22,14 @@ export class GamedataService {
     }
 
     async getGamesAsync(
-        filters?: { filterName: string; value: string }[],
+        filters: { filterName: string; value: string }[],
     ): Promise<Game[]> {
         await this.verifyTablesAsync();
-        const games = this.GamesQuery();
-        if (filters) {
-            filters.forEach((filter) => {
-                games.where(filter.filterName, filter.value);
-            });
-        }
-        return knexNest(games);
-    }
-
-    async updateGameAsync(game: Game) {
-        await this.verifyTablesAsync();
-        const query = this.GamesQuery().where(this.TableId.ID, game.id);
-        query.update(game);
-        await query;
-    }
-
-    async removeGameAsync(id: string) {
-        await this.verifyTablesAsync();
-        await this.knex(this.GAMEDATA_TABLE_NAME)
-            .where(this.TableId.ID, id)
-            .del();
-        await this.knex(this.PLAYER_COUNT_TABLE_NAME)
-            .where(this.TableId.ID, id)
-            .del();
-    }
-
-    //#region Private functionality
-
-    private readonly GamesQuery = () =>
-        this.knex
+        const gamesQuery = this.knex
             .select(
                 `g.${this.TableId.ID} AS _${this.TableId.ID}`,
                 `g.${this.TableId.NAME} AS _data_${this.TableId.NAME}`,
+                `g.${this.TableId.DESCRIPTION} AS _data_${this.TableId.DESCRIPTION}`,
                 `g.${this.TableId.RELEASEDATE} AS _data_${this.TableId.RELEASEDATE}`,
                 `g.${this.TableId.SERIESX} AS _data_${this.TableId.SERIESX}`,
                 `g.${this.TableId.XBONE} AS _data_${this.TableId.XBONE}`,
@@ -78,10 +50,46 @@ export class GamedataService {
                 `p.${this.TableId.ID}`,
             );
 
+        if (Array.isArray(filters)) {
+            filters.forEach((filter) => {
+                gamesQuery.where(`g.${filter.filterName}`, filter.value);
+            });
+        }
+        return knexNest(gamesQuery);
+    }
+
+    async updateGameAsync(game: Game) {
+        await this.verifyTablesAsync();
+        // Each table requires the id as well
+        const gameData = { id: game.id, ...game.data };
+        await this.knex(this.GAMEDATA_TABLE_NAME)
+            .where(this.TableId.ID, game.id)
+            .update({ ...gameData });
+        await game.playerInfo.forEach(async (info) => {
+            const playerInfo = { id: game.id, ...info };
+            await this.knex(this.PLAYER_COUNT_TABLE_NAME)
+                .where(this.TableId.ID, game.id)
+                .update({ ...playerInfo });
+        });
+    }
+
+    async removeGameAsync(id: string) {
+        await this.verifyTablesAsync();
+        await this.knex(this.GAMEDATA_TABLE_NAME)
+            .where(this.TableId.ID, id)
+            .del();
+        await this.knex(this.PLAYER_COUNT_TABLE_NAME)
+            .where(this.TableId.ID, id)
+            .del();
+    }
+
+    //#region Private functionality
+
     // Table column values
     private readonly TableId = {
         ID: 'id',
         NAME: 'name',
+        DESCRIPTION: 'desc',
         RELEASEDATE: 'releaseDate',
         SERIESX: 'seriesX',
         XBONE: 'xbOne',
@@ -115,6 +123,7 @@ export class GamedataService {
                 (table) => {
                     table.string(this.TableId.ID);
                     table.string(this.TableId.NAME);
+                    table.string(this.TableId.DESCRIPTION);
                     table.string(this.TableId.RELEASEDATE);
                     table.boolean(this.TableId.SERIESX);
                     table.boolean(this.TableId.XBONE);

@@ -3,20 +3,22 @@
         <title>GamePass App</title>
     </header>
     <body>
-        <div class="main" ng-app="myGames" ng-controller="gameController">
-            <section class="cards">
-                <ng-template
-                    ngFor
-                    let-item
-                    [ngForOf]="games"
-                    let-i="index"
-                    [ngForTrackBy]="getGameId"
-                >
-                    <li *ngFor="let game of games; index as i">
-                        {{ i }}/{{ games.length }} {{ game.id }}
-                    </li>
-                </ng-template>
-            </section>
+        <h1>GamePass</h1>
+        <div class="game-table" ng-app="myGames" ng-controller="gameController">
+            <li *ngFor="let game of games; index as i">
+                <mat-card class="game-card">
+                    <mat-card-header>
+                        <mat-card-title>{{ game.data.name }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <p>{{ game.data.desc }}</p>
+                        <mat-divider></mat-divider>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button mat-button>MORE DETAILS</button>
+                    </mat-card-actions>
+                </mat-card>
+            </li>
         </div>
     </body>
 </html>

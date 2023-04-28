@@ -123,7 +123,7 @@ export class GamedataService {
                 (table) => {
                     table.string(this.TableId.ID);
                     table.string(this.TableId.NAME);
-                    table.string(this.TableId.DESCRIPTION);
+                    table.string(this.TableId.DESCRIPTION, 2500);
                     table.string(this.TableId.RELEASEDATE);
                     table.boolean(this.TableId.SERIESX);
                     table.boolean(this.TableId.XBONE);

@@ -1,22 +1,23 @@
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
-import { Game, GamePlayerInfo } from './gamedata.model';
-import { KnexNest } from 'knexnest';
+import { Game } from './gamedata.model';
+
+const knexNest = require('knexnest');
 
 export class GamedataService {
-    private readonly GAMEDATA_TABLE_NAME = 'gamedata-info';
-    private readonly PLAYER_COUNT_TABLE_NAME = 'gamedata-player-count-info';
+    private readonly GAMEDATA_TABLE_NAME = 'gamedata_info';
+    private readonly PLAYER_COUNT_TABLE_NAME = 'gamedata_player_count_info';
 
-    constructor(
-        @InjectConnection() private readonly knex: Knex,
-        @InjectConnection() private readonly KnexNest: KnexNest,
-    ) {}
+    constructor(@InjectConnection() private readonly knex: Knex) {}
 
     async addGameAsync(game: Game) {
         await this.verifyTablesAsync();
-        await this.knex(this.GAMEDATA_TABLE_NAME).insert(game.data);
+        // Each table requires the id as well
+        const gameData = { id: game.id, ...game.data };
+        await this.knex(this.GAMEDATA_TABLE_NAME).insert(gameData);
         await game.playerInfo.forEach(async (info) => {
-            await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(info);
+            const playerInfo = { id: game.id, ...info };
+            await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(playerInfo);
         });
     }
 
@@ -30,19 +31,24 @@ export class GamedataService {
                 games.where(filter.filterName, filter.value);
             });
         }
-        return await this.KnexNest<Game>(games);
+        return knexNest(games);
     }
 
     async updateGameAsync(game: Game) {
         await this.verifyTablesAsync();
-        const query = this.GamesQuery().where(this.TableId.ID, game.data.id);
+        const query = this.GamesQuery().where(this.TableId.ID, game.id);
         query.update(game);
         await query;
     }
 
     async removeGameAsync(id: string) {
         await this.verifyTablesAsync();
-        await this.GamesQuery().where(this.TableId.ID, id).del();
+        await this.knex(this.GAMEDATA_TABLE_NAME)
+            .where(this.TableId.ID, id)
+            .del();
+        await this.knex(this.PLAYER_COUNT_TABLE_NAME)
+            .where(this.TableId.ID, id)
+            .del();
     }
 
     //#region Private functionality
@@ -50,25 +56,26 @@ export class GamedataService {
     private readonly GamesQuery = () =>
         this.knex
             .select(
-                `gameInfo.${this.TableId.ID} AS _data_${this.TableId.ID}`,
-                `gameInfo.${this.TableId.NAME} AS _data_${this.TableId.NAME}`,
-                `gameInfo.${this.TableId.RELEASEDATE} AS _data_${this.TableId.RELEASEDATE}`,
-                `gameInfo.${this.TableId.SERIESX} AS _data_${this.TableId.SERIESX}`,
-                `gameInfo.${this.TableId.XBONE} AS _data_${this.TableId.XBONE}`,
-                `gameInfo.${this.TableId.WINDOWS} AS _data_${this.TableId.WINDOWS}`,
-                `gameInfo.${this.TableId.CLOUD} AS _data_${this.TableId.CLOUD}`,
-                `gameInfo.${this.TableId.GENRE} AS _data_${this.TableId.GENRE}`,
-                `gameInfo.${this.TableId.CROSSPLATMULTI} AS _data_${this.TableId.CROSSPLATMULTI}`,
-                `gameInfo.${this.TableId.CROSSPLATCOOP} AS _data_${this.TableId.CROSSPLATCOOP}`,
-                `playerInfo.${this.TableId.PLAYERTYPE} AS _playerInfo__${this.TableId.PLAYERTYPE}`,
-                `playerInfo.${this.TableId.MINPLAYERS} AS _playerInfo__${this.TableId.MINPLAYERS}`,
-                `playerInfo.${this.TableId.MAXPLAYERS} AS _playerInfo__${this.TableId.MAXPLAYERS}`,
+                `g.${this.TableId.ID} AS _${this.TableId.ID}`,
+                `g.${this.TableId.NAME} AS _data_${this.TableId.NAME}`,
+                `g.${this.TableId.RELEASEDATE} AS _data_${this.TableId.RELEASEDATE}`,
+                `g.${this.TableId.SERIESX} AS _data_${this.TableId.SERIESX}`,
+                `g.${this.TableId.XBONE} AS _data_${this.TableId.XBONE}`,
+                `g.${this.TableId.WINDOWS} AS _data_${this.TableId.WINDOWS}`,
+                `g.${this.TableId.CLOUD} AS _data_${this.TableId.CLOUD}`,
+                `g.${this.TableId.GENRE} AS _data_${this.TableId.GENRE}`,
+                `g.${this.TableId.CROSSPLATMULTI} AS _data_${this.TableId.CROSSPLATMULTI}`,
+                `g.${this.TableId.CROSSPLATCOOP} AS _data_${this.TableId.CROSSPLATCOOP}`,
+                `p.${this.TableId.PLAYERTYPE} AS _playerInfo__${this.TableId.PLAYERTYPE}`,
+                `p.${this.TableId.MINPLAYERS} AS _playerInfo__${this.TableId.MINPLAYERS}`,
+                `p.${this.TableId.MAXPLAYERS} AS _playerInfo__${this.TableId.MAXPLAYERS}`,
             )
-            .from(`${this.GAMEDATA_TABLE_NAME} AS gameInfo`)
+            .as('x')
+            .from(`${this.GAMEDATA_TABLE_NAME} AS g`)
             .leftJoin(
-                `${this.PLAYER_COUNT_TABLE_NAME} AS playerInfo`,
-                `gameInfo.${this.TableId.ID}`,
-                `playerInfo.${this.TableId.ID}`,
+                `${this.PLAYER_COUNT_TABLE_NAME} AS p`,
+                `g.${this.TableId.ID}`,
+                `p.${this.TableId.ID}`,
             );
 
     // Table column values
@@ -105,16 +112,16 @@ export class GamedataService {
         if (!gameTableExists) {
             await this.knex.schema.createTable(
                 this.GAMEDATA_TABLE_NAME,
-                function (table) {
+                (table) => {
                     table.string(this.TableId.ID);
                     table.string(this.TableId.NAME);
-                    table.date(this.TableId.RELEASEDATE);
+                    table.string(this.TableId.RELEASEDATE);
                     table.boolean(this.TableId.SERIESX);
                     table.boolean(this.TableId.XBONE);
                     table.boolean(this.TableId.WINDOWS);
                     table.boolean(this.TableId.CLOUD);
                     table.string(this.TableId.GENRE);
-                    table.boolean(this.TableId.CROSSPLATMULTIPLAYER);
+                    table.boolean(this.TableId.CROSSPLATMULTI);
                     table.boolean(this.TableId.CROSSPLATCOOP);
                 },
             );
@@ -125,7 +132,7 @@ export class GamedataService {
         if (!playerTypeTableExists) {
             await this.knex.schema.createTable(
                 this.PLAYER_COUNT_TABLE_NAME,
-                function (table) {
+                (table) => {
                     table.string(this.TableId.ID);
                     table.string(this.TableId.PLAYERTYPE);
                     table.string(this.TableId.MINPLAYERS);

@@ -1,12 +1,15 @@
 export class Game {
-    constructor(public data: GameData, public playerInfo: GamePlayerInfo[]) {}
+    constructor(
+        public id: string,
+        public data: GameData,
+        public playerInfo: GamePlayerInfo[],
+    ) {}
 }
 
 export class GameData {
     constructor(
-        public id: string,
         public name: string,
-        public releaseDate: Date,
+        public releaseDate: string,
         public seriesX: boolean,
         public xbOne: boolean,
         public windows: boolean,
@@ -19,7 +22,6 @@ export class GameData {
 
 export class GamePlayerInfo {
     constructor(
-        public id: string,
         public playerType: string,
         public minPlayers: number,
         public maxPlayers: number,

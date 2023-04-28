@@ -20,6 +20,11 @@ export class GamedataController {
     }
 
     @Get()
+    async getAllGames() {
+        return await this.gamedataService.getGamesAsync([]);
+    }
+
+    @Post('filtered')
     async getGames(@Body() filters: { filterName: string; value: string }[]) {
         return await this.gamedataService.getGamesAsync(filters);
     }

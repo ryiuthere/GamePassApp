@@ -9,6 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 @NgModule({
     declarations: [AppComponent],
@@ -20,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
         MatCardModule,
         MatDividerModule,
         MatButtonModule,
+        MatSidenavModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

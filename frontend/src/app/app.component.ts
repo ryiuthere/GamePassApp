@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { GamedataService } from './gamedata/gamedata.service';
 import { Game } from './gamedata/gamedata.model';
 import { take } from 'rxjs';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
     selector: 'app-root',
@@ -10,8 +11,11 @@ import { take } from 'rxjs';
 })
 export class AppComponent {
     games: Game[];
+    selectedGame: Game | null;
+    @ViewChild('sidenav', { read: MatSidenav }) sideNav!: MatSidenav;
     constructor(private gamedataService: GamedataService) {
         this.games = [];
+        this.selectedGame = null;
     }
     title = 'frontend';
 
@@ -19,7 +23,7 @@ export class AppComponent {
         this.getAllGames();
     }
 
-    getGameId(index: number, game: Game) {
+    getGameId(game: Game) {
         return game.id;
     }
 
@@ -30,5 +34,23 @@ export class AppComponent {
             .subscribe((data) => {
                 this.games = data as Game[];
             });
+    }
+
+    updateSelectedGame(game: Game | null) {
+        if (
+            this.selectedGame !== null &&
+            game !== null &&
+            this.selectedGame.id === game.id
+        ) {
+            this.sideNav.toggle();
+            return;
+        }
+
+        this.selectedGame = game;
+        if (this.selectedGame) {
+            this.sideNav.open();
+        } else {
+            this.sideNav.close();
+        }
     }
 }

@@ -1,15 +1,29 @@
 .game-card {
-    max-width: 400px;
+    width: 300px;
+    height: 300px;
     margin: 10px;
 }
 
-.game-table {
-    display: flex;
-    flex-wrap: wrap;
-    float: left;
+.game-card p {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
 }
 
-.game-table li {
-    list-style: none;
-    flex: 1 1 auto;
+.game-table {
+    height: 100%;
+}
+
+.game-grid {
+    height: auto;
+}
+
+.header-filter {
+    float: right;
+}
+
+.toolbar-header {
+    width: 100%;
 }

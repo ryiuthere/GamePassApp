@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { GamedataService } from './gamedata/gamedata.service';
-import { Game } from './gamedata/gamedata.model';
+import { Game, GamePlayerInfo } from './gamedata/gamedata.model';
 import { take } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
 
@@ -52,5 +52,15 @@ export class AppComponent {
         } else {
             this.sideNav.close();
         }
+    }
+
+    getFormattedInfo(info: GamePlayerInfo) {
+        var playerCount =
+            info.minPlayers == info.maxPlayers
+                ? info.maxPlayers == 1
+                    ? ''
+                    : ` ${info.minPlayers} players`
+                : ` ${info.minPlayers}-${info.maxPlayers} players`;
+        return `${info.playerType}${playerCount}`;
     }
 }

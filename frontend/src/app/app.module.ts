@@ -13,6 +13,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
     declarations: [AppComponent],
@@ -28,6 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
         MatGridListModule,
         MatToolbarModule,
         MatIconModule,
+        MatExpansionModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

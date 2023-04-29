@@ -1,28 +1,30 @@
 <html lang="en">
     <body>
-        <mat-toolbar>
-            <mat-sidenav-container class="toolbar-header">
-                <mat-sidenav
-                    #filter
-                    mode="over"
-                    closed
-                    [fixedInViewport]="false"
-                >
-                    Sidenav
-                </mat-sidenav>
-                <span>GamePass App</span>
-                <button
-                    mat-icon-button
-                    aria-label="Example icon-button with menu icon"
-                    class="header-filter"
-                    (click)="filter.toggle()"
-                >
-                    <mat-icon>filter_list</mat-icon>
-                </button>
-            </mat-sidenav-container>
-        </mat-toolbar>
+        <mat-accordion hideToggle>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="title">
+                        GamePass App
+                    </mat-panel-title>
+                    <span class="header-spacer"></span>
+                    <button
+                        mat-icon-button
+                        aria-label="Example icon-button with menu icon"
+                    >
+                        <mat-icon>filter_list</mat-icon>
+                    </button>
+                </mat-expansion-panel-header>
+                <div>Filter</div>
+            </mat-expansion-panel>
+        </mat-accordion>
         <mat-sidenav-container class="game-table">
-            <mat-sidenav #sidenav mode="side" closed [fixedInViewport]="false">
+            <mat-sidenav
+                #sidenav
+                mode="side"
+                closed
+                [fixedInViewport]="false"
+                class="selected"
+            >
                 Sidenav
             </mat-sidenav>
             <mat-grid-list cols="3" class="game-grid">

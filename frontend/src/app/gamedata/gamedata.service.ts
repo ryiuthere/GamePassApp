@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Game } from './gamedata.model';
 
 @Injectable({
@@ -9,12 +9,13 @@ export class GamedataService {
     private readonly host = 'http://localhost:3000/gamedata';
     constructor(private http: HttpClient) {}
 
-    getAllGames() {
-        return this.http.get(this.GetPath());
-    }
-
+    // Change this for query
     getGames(filters: { filterName: string; value: string }[] = []) {
-        return this.http.post(this.GetPath('filtered'), filters);
+        let params = new HttpParams();
+        filters.forEach((filter) => {
+            params.set(filter.filterName, filter.value);
+        });
+        return this.http.get(this.GetPath(), { params: params });
     }
 
     addGame(game: Game) {

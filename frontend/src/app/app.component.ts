@@ -17,7 +17,6 @@ export class AppComponent {
         this.games = [];
         this.selectedGame = null;
     }
-    title = 'frontend';
 
     ngOnInit() {
         this.getAllGames();
@@ -29,11 +28,18 @@ export class AppComponent {
 
     getAllGames() {
         this.gamedataService
-            .getAllGames()
+            .getGames()
             .pipe(take(1))
             .subscribe((data) => {
                 this.games = data as Game[];
             });
+    }
+
+    getGames(filters: { filterName: string; value: string }[]) {
+        this.gamedataService
+            .getGames(filters)
+            .pipe(take(1))
+            .subscribe((data) => (this.games = data as Game[]));
     }
 
     updateSelectedGame(game: Game | null) {

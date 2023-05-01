@@ -12,12 +12,9 @@ import { GamedataModule } from './gamedata/gamedata.module';
                 config: {
                     client: 'postgresql',
                     version: '15.2',
-                    connection: {
-                        host: 'localhost',
-                        user: 'postgres',
-                        password: 'test',
-                        database: 'postgres',
-                    },
+                    connection:
+                        process.env.DATABASE_URL ||
+                        'postgres://user:password@localhost:5432/gamedb',
                 },
             }),
         }),

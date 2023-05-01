@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  backend:
+    container_name: gamepassapp_backend
+    # Select correct docker file name in correct folder, with the correct stage ('development')
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+      target: development
+    volumes:
+      - ./backend:/ryiu/backend/src/app
+    command: npm run start
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://user:password@gamepassapp_db:5432/gamedb
+    ports:
+      - 3000:3000
+
+  frontend:
+    container_name: gamepassapp_frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+      target: development
+    volumes:
+      - ./frontend:/ryiu/frontend/src/app
+    command: npm run start
+    ports:
+      - 4200:4200
+    # Required for frontend to see the backend
+    links:
+      - backend
+
+  postgres:
+    container_name: gamepassapp_db
+    image: postgres:15.2
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: gamedb
+    ports:
+      - 5432:5432
+
+  postgres_admin:
+    container_name: gamepassapp_db_admin
+    image: dpage/pgadmin4:7.0
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - 8080:80

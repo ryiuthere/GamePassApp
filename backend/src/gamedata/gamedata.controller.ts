@@ -6,6 +6,7 @@ import {
     Param,
     Patch,
     Post,
+    Query,
 } from '@nestjs/common';
 import { Game } from './gamedata.model';
 import { GamedataService } from './gamedata.service';
@@ -20,12 +21,7 @@ export class GamedataController {
     }
 
     @Get()
-    async getAllGames() {
-        return await this.gamedataService.getGamesAsync([]);
-    }
-
-    @Post('filtered')
-    async getGames(@Body() filters: { filterName: string; value: string }[]) {
+    async getGames(@Query() filters) {
         return await this.gamedataService.getGamesAsync(filters);
     }
 

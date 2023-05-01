@@ -18,6 +18,7 @@ enum GameTableId {
     GENRE = 'genre',
     CROSSPLATMULTI = 'crossplatMultiplayer',
     CROSSPLATCOOP = 'crossplatCoop',
+    FAVORITE = 'favorite',
 }
 
 enum PlayerTableId {
@@ -59,6 +60,7 @@ export class GamedataService {
                 `g.${GameTableId.GENRE} AS _data_${GameTableId.GENRE}`,
                 `g.${GameTableId.CROSSPLATMULTI} AS _data_${GameTableId.CROSSPLATMULTI}`,
                 `g.${GameTableId.CROSSPLATCOOP} AS _data_${GameTableId.CROSSPLATCOOP}`,
+                `g.${GameTableId.FAVORITE} AS _data_${GameTableId.FAVORITE}`,
                 `p.${PlayerTableId.PLAYERTYPE} AS _playerInfo__${PlayerTableId.PLAYERTYPE}`,
                 `p.${PlayerTableId.MINPLAYERS} AS _playerInfo__${PlayerTableId.MINPLAYERS}`,
                 `p.${PlayerTableId.MAXPLAYERS} AS _playerInfo__${PlayerTableId.MAXPLAYERS}`,
@@ -130,8 +132,6 @@ export class GamedataService {
 
     //#region Private functionality
 
-    // Table column values
-
     // Values for player type
     private readonly PlayerType = {
         SINGLE: 'singlePlayer',
@@ -162,6 +162,7 @@ export class GamedataService {
                     table.string(GameTableId.GENRE);
                     table.boolean(GameTableId.CROSSPLATMULTI);
                     table.boolean(GameTableId.CROSSPLATCOOP);
+                    table.boolean(GameTableId.FAVORITE);
                 },
             );
         }

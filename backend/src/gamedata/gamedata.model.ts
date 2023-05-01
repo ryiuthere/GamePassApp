@@ -18,6 +18,7 @@ export class GameData {
         public genre: string,
         public crossplatMultiplayer: boolean,
         public crossplatCoop: boolean,
+        public favorite: boolean,
     ) {}
 }
 

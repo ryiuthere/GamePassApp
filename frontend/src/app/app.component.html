@@ -39,11 +39,11 @@
                         <p>{{ (selectedGame?.data)!.desc }}</p>
                         <span class="transparent"
                             >released
-                            {{ (selectedGame?.data)!.releaseDate }}</span
+                            {{ (selectedGame?.data)!.release_date }}</span
                         >
                         <mat-list>
                             <mat-list-item
-                                *ngFor="let info of selectedGame?.playerInfo!"
+                                *ngFor="let info of selectedGame?.player_info!"
                             >
                                 <button
                                     mat-stroked-button

@@ -1,24 +1,25 @@
 export interface Game {
     id: string;
     data: GameData;
-    playerInfo: GamePlayerInfo[];
+    player_info: GamePlayerInfo[];
 }
 
 export interface GameData {
     name: string;
     desc: string;
-    releaseDate: string;
-    seriesX: boolean;
-    xbOne: boolean;
+    release_date: string;
+    series_x: boolean;
+    xbone: boolean;
     windows: boolean;
     cloud: boolean;
     genre: string;
-    crossplatMultiplayer: boolean;
-    crossplatCoop: boolean;
+    crossplat_multi: boolean;
+    crossplat_coop: boolean;
+    favorite: boolean;
 }
 
 export interface GamePlayerInfo {
     playerType: string;
-    minPlayers: number;
-    maxPlayers: number;
+    min_players: number;
+    max_players: number;
 }

@@ -1,5 +1,107 @@
 <h2 mat-dialog-title>Create New Game</h2>
-<mat-dialog-content class="mat-typography">Testing</mat-dialog-content>
+<mat-dialog-content>
+    <div class="dialog-container">
+        <form [formGroup]="dialogDataForm">
+            <table class="full-width" cellspacing="0">
+                <td>
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>ID</mat-label>
+                        <input
+                            matInput
+                            placeholder="Enter a unique ID here..."
+                            formControlName="id"
+                        />
+                        <mat-error> Please enter an ID </mat-error>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>Title</mat-label>
+                        <input
+                            matInput
+                            placeholder="Enter title here..."
+                            formControlName="title"
+                        />
+                        <mat-error> Please enter a title </mat-error>
+                    </mat-form-field>
+                </td>
+            </table>
+            <p>
+                <mat-form-field appearance="fill" class="full-width">
+                    <mat-label>Description</mat-label>
+                    <textarea
+                        matInput
+                        placeholder="Enter description here..."
+                        formControlName="description"
+                        rows="5"
+                    ></textarea>
+                </mat-form-field>
+            </p>
+            <table class="full-width" cellspacing="0">
+                <td>
+                    <mat-form-field color="accent" appearance="fill">
+                        <mat-label>Select Release Date</mat-label>
+                        <input
+                            matInput
+                            [matDatepicker]="picker1"
+                            formControlName="releaseDate"
+                        />
+                        <mat-datepicker-toggle
+                            matIconSuffix
+                            [for]="picker1"
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                        <mat-error>Please choose a release date</mat-error>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Genre</mat-label>
+                        <mat-select formControlName="genre">
+                            <mat-option
+                                *ngFor="let genre of genres"
+                                value="{{ genre }}"
+                                >{{ genre }}</mat-option
+                            >
+                        </mat-select>
+                        <mat-error>Please choose a genre</mat-error>
+                    </mat-form-field>
+                </td>
+            </table>
+        </form>
+        <h3>Compatibility</h3>
+        <div>
+            <mat-chip-listbox selectable multiple>
+                <mat-chip-option
+                    (selectionChange)="modifyGameTag('seriesx', $event)"
+                    >Series X</mat-chip-option
+                >
+                <mat-chip-option
+                    (selectionChange)="modifyGameTag('xbone', $event)"
+                    >Xbox One</mat-chip-option
+                >
+                <mat-chip-option
+                    (selectionChange)="modifyGameTag('windows', $event)"
+                    >Windows</mat-chip-option
+                >
+                <mat-chip-option
+                    (selectionChange)="modifyGameTag('cloud', $event)"
+                    >Cloud</mat-chip-option
+                >
+                <mat-chip-option
+                    (selectionChange)="
+                        modifyGameTag('crossplatMultiplayer', $event)
+                    "
+                    >Cross-Platform Multiplayer</mat-chip-option
+                >
+                <mat-chip-option
+                    (selectionChange)="modifyGameTag('crossplatCoop', $event)"
+                    >Cross-Platform Co-op</mat-chip-option
+                >
+            </mat-chip-listbox>
+        </div>
+    </div>
+</mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Cancel</button>
     <button mat-button (click)="saveGameInfo()" cdkFocusInitial>

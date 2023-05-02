@@ -8,22 +8,22 @@ enum GameTableId {
     id = 'id',
     name = 'name',
     description = 'desc',
-    release_date = 'release_date',
-    series_x = 'series_x',
+    releaseDate = 'releaseDate',
+    seriesx = 'seriesx',
     xbone = 'xbone',
     windows = 'windows',
     cloud = 'cloud',
     genre = 'genre',
-    crossplat_multi = 'crossplat_multi',
-    crossplat_coop = 'crossplat_coop',
+    crossplatMultiplayer = 'crossplatMultiplayer',
+    crossplatCoop = 'crossplatCoop',
     favorite = 'favorite',
 }
 
 enum PlayerTableId {
     id = 'id',
-    player_type = 'player_type',
-    min_players = 'min_players',
-    max_players = 'max_players',
+    playerType = 'playerType',
+    minPlayers = 'minPlayers',
+    maxPlayers = 'maxPlayers',
 }
 
 export class GamedataService {
@@ -37,7 +37,7 @@ export class GamedataService {
         // Each table requires the id as well
         const gameData = { id: game.id, ...game.data };
         await this.knex(this.GAMEDATA_TABLE_NAME).insert(gameData);
-        await game.player_info.forEach(async (info) => {
+        await game.playerInfo.forEach(async (info) => {
             const playerInfo = { id: game.id, ...info };
             await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(playerInfo);
         });
@@ -50,23 +50,23 @@ export class GamedataService {
                 `g.${GameTableId.id} AS _${GameTableId.id}`,
                 `g.${GameTableId.name} AS _data_${GameTableId.name}`,
                 `g.${GameTableId.description} AS _data_${GameTableId.description}`,
-                `g.${GameTableId.release_date} AS _data_${GameTableId.release_date}`,
-                `g.${GameTableId.series_x} AS _data_${GameTableId.series_x}`,
+                `g.${GameTableId.releaseDate} AS _data_${GameTableId.releaseDate}`,
+                `g.${GameTableId.seriesx} AS _data_${GameTableId.seriesx}`,
                 `g.${GameTableId.xbone} AS _data_${GameTableId.xbone}`,
                 `g.${GameTableId.windows} AS _data_${GameTableId.windows}`,
                 `g.${GameTableId.cloud} AS _data_${GameTableId.cloud}`,
                 `g.${GameTableId.genre} AS _data_${GameTableId.genre}`,
-                `g.${GameTableId.crossplat_multi} AS _data_${GameTableId.crossplat_multi}`,
-                `g.${GameTableId.crossplat_coop} AS _data_${GameTableId.crossplat_coop}`,
+                `g.${GameTableId.crossplatMultiplayer} AS _data_${GameTableId.crossplatMultiplayer}`,
+                `g.${GameTableId.crossplatCoop} AS _data_${GameTableId.crossplatCoop}`,
                 `g.${GameTableId.favorite} AS _data_${GameTableId.favorite}`,
-                `p.${PlayerTableId.player_type} AS _${'player_info'}__${
-                    PlayerTableId.player_type
+                `p.${PlayerTableId.playerType} AS _${'playerInfo'}__${
+                    PlayerTableId.playerType
                 }`,
-                `p.${PlayerTableId.min_players} AS _${'player_info'}__${
-                    PlayerTableId.min_players
+                `p.${PlayerTableId.minPlayers} AS _${'playerInfo'}__${
+                    PlayerTableId.minPlayers
                 }`,
-                `p.${PlayerTableId.max_players} AS _${'player_info'}__${
-                    PlayerTableId.max_players
+                `p.${PlayerTableId.maxPlayers} AS _${'playerInfo'}__${
+                    PlayerTableId.maxPlayers
                 }`,
             )
             .from(`${this.GAMEDATA_TABLE_NAME} AS g`)
@@ -78,11 +78,11 @@ export class GamedataService {
 
         // Allows for properly filtering by player type
         // Can not currently filter min and max players
-        if (filters?.player_type) {
+        if (filters?.playerType) {
             const innerQuery = this.knex
                 .select(PlayerTableId.id)
                 .from(this.PLAYER_COUNT_TABLE_NAME)
-                .where(PlayerTableId.player_type, filters.player_type);
+                .where(PlayerTableId.playerType, filters.playerType);
 
             gamesQuery
                 .leftJoin(
@@ -110,7 +110,7 @@ export class GamedataService {
         await this.knex(this.GAMEDATA_TABLE_NAME)
             .where(GameTableId.id, game.id)
             .update({ ...gameData });
-        await game.player_info.forEach(async (info) => {
+        await game.playerInfo.forEach(async (info) => {
             const playerInfo = { id: game.id, ...info };
             await this.knex(this.PLAYER_COUNT_TABLE_NAME)
                 .where(PlayerTableId.id, game.id)
@@ -158,14 +158,14 @@ export class GamedataService {
                     table.string(GameTableId.id);
                     table.string(GameTableId.name);
                     table.string(GameTableId.description, 2500);
-                    table.string(GameTableId.release_date);
-                    table.boolean(GameTableId.series_x);
+                    table.string(GameTableId.releaseDate);
+                    table.boolean(GameTableId.seriesx);
                     table.boolean(GameTableId.xbone);
                     table.boolean(GameTableId.windows);
                     table.boolean(GameTableId.cloud);
                     table.string(GameTableId.genre);
-                    table.boolean(GameTableId.crossplat_multi);
-                    table.boolean(GameTableId.crossplat_coop);
+                    table.boolean(GameTableId.crossplatMultiplayer);
+                    table.boolean(GameTableId.crossplatCoop);
                     table.boolean(GameTableId.favorite);
                 },
             );
@@ -178,9 +178,9 @@ export class GamedataService {
                 this.PLAYER_COUNT_TABLE_NAME,
                 (table) => {
                     table.string(PlayerTableId.id);
-                    table.string(PlayerTableId.player_type);
-                    table.string(PlayerTableId.min_players);
-                    table.string(PlayerTableId.max_players);
+                    table.string(PlayerTableId.playerType);
+                    table.string(PlayerTableId.minPlayers);
+                    table.string(PlayerTableId.maxPlayers);
                 },
             );
         }

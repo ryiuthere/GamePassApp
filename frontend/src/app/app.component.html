@@ -34,11 +34,11 @@
                 <br />
                 <p>{{ (selectedGame?.data)!.desc }}</p>
                 <span class="transparent"
-                    >released {{ (selectedGame?.data)!.release_date }}</span
+                    >released {{ (selectedGame?.data)!.releaseDate }}</span
                 >
                 <mat-list>
                     <mat-list-item
-                        *ngFor="let info of selectedGame?.player_info!"
+                        *ngFor="let info of selectedGame?.playerInfo!"
                     >
                         <button
                             mat-stroked-button

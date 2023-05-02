@@ -71,11 +71,11 @@ export class AppComponent {
 
     getFormattedInfo(info: GamePlayerInfo) {
         var playerCount =
-            info.min_players == info.max_players
-                ? info.max_players == 1
+            info.minPlayers == info.maxPlayers
+                ? info.maxPlayers == 1
                     ? ''
-                    : ` ${info.min_players} players`
-                : ` ${info.min_players}-${info.max_players} players`;
+                    : ` ${info.minPlayers} players`
+                : ` ${info.minPlayers}-${info.maxPlayers} players`;
         return `${info.playerType}${playerCount}`;
     }
 }

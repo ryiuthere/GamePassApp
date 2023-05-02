@@ -13,6 +13,14 @@
         <div>Filter</div>
     </mat-expansion-panel>
 </mat-accordion>
+<button
+    mat-flat-button
+    color="primary"
+    class="new-game-button"
+    (click)="openCreateGameDialog()"
+>
+    <mat-icon>videogame_asset</mat-icon>Add New Game
+</button>
 <mat-sidenav-container class="game-table">
     <mat-sidenav
         #sidenav

@@ -3,6 +3,8 @@ import { GamedataService } from './gamedata/gamedata.service';
 import { Game, GamePlayerInfo } from './gamedata/gamedata.model';
 import { take } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateGameDialogComponent } from './create-game/create-game-dialog.component';
 
 @Component({
     selector: 'app-root',
@@ -12,8 +14,12 @@ import { MatSidenav } from '@angular/material/sidenav';
 export class AppComponent {
     games: Game[];
     selectedGame: Game | null;
-    @ViewChild('sidenav', { read: MatSidenav }) sideNav!: MatSidenav;
-    constructor(private gamedataService: GamedataService) {
+    @ViewChild('sidenav', { read: MatSidenav })
+    sideNav!: MatSidenav;
+    constructor(
+        public dialog: MatDialog,
+        private gamedataService: GamedataService
+    ) {
         this.games = [];
         this.selectedGame = null;
     }
@@ -40,6 +46,19 @@ export class AppComponent {
             .getGames(filters)
             .pipe(take(1))
             .subscribe((data) => (this.games = data as Game[]));
+    }
+
+    openCreateGameDialog() {
+        const dialogRef = this.dialog.open(CreateGameDialogComponent);
+
+        dialogRef
+            .afterClosed()
+            .pipe(take(1))
+            .subscribe((result) => {
+                if (result) {
+                    console.log(result);
+                }
+            });
     }
 
     toggleFavorite(game: Game | null) {

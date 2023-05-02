@@ -7,10 +7,8 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./backend
-      target: development
     volumes:
       - ./backend:/ryiu/backend/src/app
-    command: npm run start
     depends_on:
       - postgres
     environment:
@@ -23,12 +21,10 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./frontend
-      target: development
     volumes:
       - ./frontend:/ryiu/frontend/src/app
-    command: npm run start
-    ports:
-      - 4200:4200
+    ports:  
+      - 4200:80
     # Required for frontend to see the backend
     links:
       - backend

@@ -96,7 +96,11 @@
                         (click)="updateSelectedGame(game)"
                         color="primary"
                     >
-                        MORE DETAILS
+                        {{
+                            selectedGame?.id === game.id
+                                ? "HIDE DETAILS"
+                                : "MORE DETAILS"
+                        }}
                     </button>
                 </mat-card-actions>
             </mat-card>

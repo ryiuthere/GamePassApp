@@ -28,10 +28,6 @@ export class AppComponent {
         this.getAllGames();
     }
 
-    getGameId(game: Game) {
-        return game.id;
-    }
-
     getAllGames() {
         this.gamedataService
             .getGames()
@@ -48,6 +44,10 @@ export class AppComponent {
             .subscribe((data) => (this.games = data as Game[]));
     }
 
+    addGame(game: Game) {
+        this.gamedataService.addGame(game).pipe(take(1)).subscribe();
+    }
+
     openCreateGameDialog() {
         const dialogRef = this.dialog.open(CreateGameDialogComponent);
 
@@ -56,7 +56,8 @@ export class AppComponent {
             .pipe(take(1))
             .subscribe((result) => {
                 if (result) {
-                    console.log(result);
+                    this.addGame(result);
+                    this.games.push(result);
                 }
             });
     }

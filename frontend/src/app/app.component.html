@@ -1,102 +1,98 @@
-<html lang="en">
-    <body>
-        <mat-accordion hideToggle>
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    <mat-panel-title class="title">
-                        GamePass App
-                    </mat-panel-title>
-                    <span class="header-spacer"></span>
-                    <button
-                        mat-icon-button
-                        aria-label="Example icon-button with menu icon"
-                    >
-                        <mat-icon>filter_list</mat-icon>
-                    </button>
-                </mat-expansion-panel-header>
-                <div>Filter</div>
-            </mat-expansion-panel>
-        </mat-accordion>
-        <mat-sidenav-container class="game-table">
-            <mat-sidenav
-                #sidenav
-                mode="side"
-                closed
-                [fixedInViewport]="false"
-                class="selected"
+<mat-accordion hideToggle>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title class="title"> Games Library </mat-panel-title>
+            <span class="header-spacer"></span>
+            <button
+                mat-icon-button
+                aria-label="Example icon-button with menu icon"
             >
-                <mat-card>
-                    <mat-card-header>
-                        <mat-card-title>
-                            {{ (selectedGame?.data)!.name }}
-                        </mat-card-title>
-                        <mat-card-subtitle>
-                            {{ (selectedGame?.data)!.genre }}
-                        </mat-card-subtitle>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <br />
-                        <p>{{ (selectedGame?.data)!.desc }}</p>
-                        <span class="transparent"
-                            >released
-                            {{ (selectedGame?.data)!.release_date }}</span
-                        >
-                        <mat-list>
-                            <mat-list-item
-                                *ngFor="let info of selectedGame?.player_info!"
-                            >
-                                <button
-                                    mat-stroked-button
-                                    extended
-                                    color="primary"
-                                    class="tag"
-                                >
-                                    {{ getFormattedInfo(info) }}
-                                </button>
-                            </mat-list-item>
-                        </mat-list>
-                        <mat-divider></mat-divider>
-                    </mat-card-content>
-                    <mat-card-actions>
-                        <button mat-button color="accent">
-                            <mat-icon>star_border</mat-icon> Favorite
-                        </button>
-                    </mat-card-actions>
-                </mat-card>
-            </mat-sidenav>
-            <mat-grid-list cols="3" class="game-grid">
-                <mat-grid-tile
-                    *ngFor="let game of games"
-                    [colspan]="1"
-                    [rowspan]="1"
+                <mat-icon>filter_list</mat-icon>
+            </button>
+        </mat-expansion-panel-header>
+        <div>Filter</div>
+    </mat-expansion-panel>
+</mat-accordion>
+<mat-sidenav-container class="game-table">
+    <mat-sidenav
+        #sidenav
+        mode="side"
+        closed
+        [fixedInViewport]="false"
+        class="selected"
+    >
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>
+                    {{ (selectedGame?.data)!.name }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                    {{ (selectedGame?.data)!.genre }}
+                </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <br />
+                <p>{{ (selectedGame?.data)!.desc }}</p>
+                <span class="transparent"
+                    >released {{ (selectedGame?.data)!.release_date }}</span
                 >
-                    <mat-card class="game-card">
-                        <mat-card-header>
-                            <mat-card-title>{{
-                                game.data.name
-                            }}</mat-card-title>
-                            <mat-card-subtitle>{{
-                                game.data.genre
-                            }}</mat-card-subtitle>
-                        </mat-card-header>
-                        <mat-card-content>
-                            <br />
-                            <p>{{ game.data.desc }}</p>
-                            <mat-divider></mat-divider>
-                        </mat-card-content>
-                        <mat-card-actions>
-                            <button
-                                mat-button
-                                (click)="updateSelectedGame(game)"
-                                color="primary"
-                            >
-                                MORE DETAILS
-                            </button>
-                        </mat-card-actions>
-                    </mat-card>
-                </mat-grid-tile>
-            </mat-grid-list>
-        </mat-sidenav-container>
-        <div class="game-description"></div>
-    </body>
-</html>
+                <mat-list>
+                    <mat-list-item
+                        *ngFor="let info of selectedGame?.player_info!"
+                    >
+                        <button
+                            mat-stroked-button
+                            extended
+                            color="primary"
+                            class="tag"
+                        >
+                            {{ getFormattedInfo(info) }}
+                        </button>
+                    </mat-list-item>
+                </mat-list>
+                <mat-divider></mat-divider>
+            </mat-card-content>
+            <mat-card-actions>
+                <button
+                    mat-button
+                    (click)="toggleFavorite(selectedGame)"
+                    color="accent"
+                >
+                    <mat-icon>{{
+                        (selectedGame?.data)!.favorite ? "star" : "star_border"
+                    }}</mat-icon>
+                    {{
+                        (selectedGame?.data)!.favorite
+                            ? "Favorited"
+                            : "Add to favorites"
+                    }}
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </mat-sidenav>
+    <mat-grid-list cols="3" class="game-grid">
+        <mat-grid-tile *ngFor="let game of games" [colspan]="1" [rowspan]="1">
+            <mat-card class="game-card">
+                <mat-card-header>
+                    <mat-card-title>{{ game.data.name }}</mat-card-title>
+                    <mat-card-subtitle>{{ game.data.genre }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <br />
+                    <p>{{ game.data.desc }}</p>
+                    <mat-divider></mat-divider>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button
+                        mat-button
+                        (click)="updateSelectedGame(game)"
+                        color="primary"
+                    >
+                        MORE DETAILS
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </mat-grid-tile>
+    </mat-grid-list>
+</mat-sidenav-container>
+<div class="game-description"></div>

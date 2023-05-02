@@ -42,6 +42,15 @@ export class AppComponent {
             .subscribe((data) => (this.games = data as Game[]));
     }
 
+    toggleFavorite(game: Game | null) {
+        if (!game) {
+            return;
+        }
+
+        game.data.favorite = !game.data.favorite;
+        this.gamedataService.updateGame(game).pipe(take(1)).subscribe();
+    }
+
     updateSelectedGame(game: Game | null) {
         if (
             this.selectedGame !== null &&

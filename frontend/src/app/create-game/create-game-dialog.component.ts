@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Game } from '../gamedata/gamedata.model';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+    FormBuilder,
+    FormControl,
+    FormGroup,
+    Validators,
+} from '@angular/forms';
 import { takeWhile } from 'rxjs';
 import { MatChipSelectionChange } from '@angular/material/chips';
 
@@ -11,12 +16,7 @@ import { MatChipSelectionChange } from '@angular/material/chips';
     styleUrls: ['./create-game-dialog.component.scss'],
 })
 export class CreateGameDialogComponent {
-    modifyingGame = true;
-    game: Game;
-    dialogDataForm: FormGroup;
-    playerInfo: FormControl[];
-    gameDataTags = new Map<string, boolean>();
-    genres = [
+    readonly genres = [
         'Indie',
         'Strategy',
         'Shooter',
@@ -26,8 +26,40 @@ export class CreateGameDialogComponent {
         'Puzzle',
         'Role Playing',
     ];
-    genre: string;
-    constructor(private dialog: MatDialogRef<CreateGameDialogComponent>) {
+
+    modifyingGame: boolean;
+    game: Game;
+    dialogDataForm: FormGroup;
+    gameDataTags: Map<string, boolean>;
+
+    playerInfoTags = this.formBuilder.group({
+        singlePlayer: false,
+        localMulti: this.formBuilder.group({
+            enabled: false,
+            minPlayers: 2,
+            maxPlayers: 2,
+        }),
+        localCoop: this.formBuilder.group({
+            enabled: false,
+            minPlayers: 2,
+            maxPlayers: 2,
+        }),
+        onlineMulti: this.formBuilder.group({
+            enabled: false,
+            minPlayers: 2,
+            maxPlayers: 2,
+        }),
+        onlineCoop: this.formBuilder.group({
+            enabled: false,
+            minPlayers: 2,
+            maxPlayers: 2,
+        }),
+    });
+
+    constructor(
+        private dialog: MatDialogRef<CreateGameDialogComponent>,
+        private formBuilder: FormBuilder
+    ) {
         this.game = {
             id: '',
             data: {
@@ -45,6 +77,7 @@ export class CreateGameDialogComponent {
             },
             playerInfo: [],
         };
+        this.modifyingGame = true;
         this.dialogDataForm = new FormGroup({
             id: new FormControl(this.game.id, [Validators.required]),
             title: new FormControl(this.game.data.name, [Validators.required]),
@@ -52,23 +85,10 @@ export class CreateGameDialogComponent {
             releaseDate: new FormControl(Date, [Validators.required]),
             genre: new FormControl(this.game.data.genre, [Validators.required]),
         });
-        this.playerInfo = [];
         this.dialogDataForm.valueChanges
             .pipe(takeWhile(() => this.modifyingGame))
             .subscribe((data) => this.onDialogChange(data));
-        this.genre = '';
-    }
-
-    private onDialogChange(data: any) {
-        this.game.id = data.id;
-        this.game.data.name = data.title;
-        this.game.data.desc = data.description;
-        if (data.releaseDate instanceof Date) {
-            this.game.data.releaseDate = data.releaseDate
-                .toISOString()
-                .split('T')[0];
-        }
-        this.game.data.genre = data.genre;
+        this.gameDataTags = new Map<string, boolean>();
     }
 
     modifyGameTag(name: string, event: MatChipSelectionChange) {
@@ -111,7 +131,57 @@ export class CreateGameDialogComponent {
                 }
             }
         }
-
+        this.applyPlayerTypeChanges();
         this.dialog.close(this.game);
+    }
+
+    private onDialogChange(data: any) {
+        this.game.id = data.id;
+        this.game.data.name = data.title;
+        this.game.data.desc = data.description;
+        if (data.releaseDate instanceof Date) {
+            this.game.data.releaseDate = data.releaseDate
+                .toISOString()
+                .split('T')[0];
+        }
+        this.game.data.genre = data.genre;
+    }
+
+    private applyPlayerTypeChanges() {
+        if (this.playerInfoTags.value.singlePlayer) {
+            this.game.playerInfo.push({
+                playerType: 'singlePlayer',
+                minPlayers: 1,
+                maxPlayers: 1,
+            });
+        }
+        if (this.playerInfoTags.value.localMulti?.enabled) {
+            this.game.playerInfo.push({
+                playerType: 'localMultiplayer',
+                minPlayers: this.playerInfoTags.value.localMulti.minPlayers!,
+                maxPlayers: this.playerInfoTags.value.localMulti.maxPlayers!,
+            });
+        }
+        if (this.playerInfoTags.value.localCoop?.enabled) {
+            this.game.playerInfo.push({
+                playerType: 'localCoop',
+                minPlayers: this.playerInfoTags.value.localCoop.minPlayers!,
+                maxPlayers: this.playerInfoTags.value.localCoop.maxPlayers!,
+            });
+        }
+        if (this.playerInfoTags.value.onlineMulti?.enabled) {
+            this.game.playerInfo.push({
+                playerType: 'onlineMultiplayer',
+                minPlayers: this.playerInfoTags.value.onlineMulti.minPlayers!,
+                maxPlayers: this.playerInfoTags.value.onlineMulti.maxPlayers!,
+            });
+        }
+        if (this.playerInfoTags.value.onlineCoop?.enabled) {
+            this.game.playerInfo.push({
+                playerType: 'onlineCoop',
+                minPlayers: this.playerInfoTags.value.onlineCoop.minPlayers!,
+                maxPlayers: this.playerInfoTags.value.onlineCoop.maxPlayers!,
+            });
+        }
     }
 }

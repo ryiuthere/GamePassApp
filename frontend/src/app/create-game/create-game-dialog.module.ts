@@ -11,6 +11,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
     declarations: [CreateGameDialogComponent],
@@ -26,6 +28,8 @@ import { CommonModule } from '@angular/common';
         MatNativeDateModule,
         MatSelectModule,
         CommonModule,
+        MatExpansionModule,
+        MatCheckboxModule,
     ],
     providers: [MatDatepickerModule],
 })

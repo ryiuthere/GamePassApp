@@ -100,6 +100,152 @@
                 >
             </mat-chip-listbox>
         </div>
+        <h3>Player Categories</h3>
+        <div [formGroup]="playerInfoTags">
+            <mat-expansion-panel #singlePlayerPanel disabled>
+                <mat-expansion-panel-header>
+                    <mat-checkbox formControlName="singlePlayer"
+                        >SinglePlayer</mat-checkbox
+                    >
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+            <mat-expansion-panel
+                #localMulti
+                disabled
+                formGroupName="localMulti"
+            >
+                <mat-expansion-panel-header>
+                    <mat-checkbox
+                        formControlName="enabled"
+                        (change)="localMulti.toggle()"
+                        >Local Multiplayer</mat-checkbox
+                    >
+                </mat-expansion-panel-header>
+                <table cellspacing="0">
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Minimum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="minPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Maximum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="maxPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                </table>
+            </mat-expansion-panel>
+            <mat-expansion-panel #localCoop disabled formGroupName="localCoop">
+                <mat-expansion-panel-header>
+                    <mat-checkbox
+                        formControlName="enabled"
+                        (change)="localCoop.toggle()"
+                        >Local Coop</mat-checkbox
+                    >
+                </mat-expansion-panel-header>
+                <table cellspacing="0">
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Minimum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="minPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Maximum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="maxPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                </table>
+            </mat-expansion-panel>
+            <mat-expansion-panel
+                #onlineMulti
+                disabled
+                formGroupName="onlineMulti"
+            >
+                <mat-expansion-panel-header>
+                    <mat-checkbox
+                        formControlName="enabled"
+                        (change)="onlineMulti.toggle()"
+                        >Online Multiplayer</mat-checkbox
+                    >
+                </mat-expansion-panel-header>
+                <table cellspacing="0">
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Minimum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="minPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Maximum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="maxPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                </table>
+            </mat-expansion-panel>
+            <mat-expansion-panel
+                #onlineCoop
+                disabled
+                formGroupName="onlineCoop"
+            >
+                <mat-expansion-panel-header>
+                    <mat-checkbox
+                        formControlName="enabled"
+                        (change)="onlineCoop.toggle()"
+                        >Online Coop</mat-checkbox
+                    >
+                </mat-expansion-panel-header>
+                <table cellspacing="0">
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Minimum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="minPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="fill" class="full-width">
+                            <mat-label>Maximum Players</mat-label>
+                            <input
+                                matInput
+                                formControlName="maxPlayers"
+                                type="number"
+                            />
+                        </mat-form-field>
+                    </td>
+                </table>
+            </mat-expansion-panel>
+        </div>
     </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

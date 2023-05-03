@@ -61,7 +61,6 @@ export class AppComponent {
     }
 
     updateGame(game: Game) {
-        console.log(JSON.stringify(game));
         this.gamedataService
             .updateGame(game)
             .pipe(take(1))

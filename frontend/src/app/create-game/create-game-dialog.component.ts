@@ -69,7 +69,6 @@ export class CreateGameDialogComponent {
     }
 
     ngOnInit() {
-        console.log(this.game.data);
         this.dialogDataForm = new FormGroup({
             id: new FormControl(this.game.id, [Validators.required]),
             title: new FormControl(this.game.data.name, [Validators.required]),

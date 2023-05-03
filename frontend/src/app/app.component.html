@@ -44,7 +44,7 @@
                 <span class="transparent"
                     >released {{ (selectedGame?.data)!.releaseDate }}</span
                 >
-                <mat-chip-listbox>
+                <mat-chip-listbox selectable="false">
                     <mat-chip-option
                         *ngFor="let info of selectedGame?.playerInfo!"
                     >

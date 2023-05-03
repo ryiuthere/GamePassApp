@@ -7,8 +7,6 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./backend
-    volumes:
-      - ./backend:/ryiu/backend/src/app
     depends_on:
       - postgres
     environment:
@@ -21,8 +19,6 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./frontend
-    volumes:
-      - ./frontend:/ryiu/frontend/src/app
     ports:  
       - 4200:80
     # Required for frontend to see the backend

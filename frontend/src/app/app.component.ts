@@ -43,6 +43,7 @@ export class AppComponent {
             .getGames(this.filters)
             .pipe(take(1))
             .subscribe((data) => {
+                if (!data) return;
                 this.games = data as Game[];
                 this.games = this.games.sort((a, b) =>
                     a.data.name.localeCompare(b.data.name)

@@ -226,9 +226,6 @@ export class CreateGameDialogComponent {
             info.maxPlayers = relevantInfos[0].maxPlayers;
         }
 
-        console.log(
-            'Existing info? ' + playerType + ' : ' + JSON.stringify(info)
-        );
         return info;
     }
 }

@@ -23,7 +23,7 @@ export class CreateGameDialogComponent {
         'Strategy',
         'Shooter',
         'Sports',
-        'Action & Adventure',
+        'Action/Adventure',
         'Platformer',
         'Puzzle',
         'Role Playing',
@@ -35,6 +35,7 @@ export class CreateGameDialogComponent {
     dialogDataForm!: FormGroup;
     gameDataTags!: Map<string, boolean>;
     playerInfoTags!: FormGroup;
+    title!: string;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -68,6 +69,7 @@ export class CreateGameDialogComponent {
     }
 
     ngOnInit() {
+        console.log(this.game.data);
         this.dialogDataForm = new FormGroup({
             id: new FormControl(this.game.id, [Validators.required]),
             title: new FormControl(this.game.data.name, [Validators.required]),
@@ -112,6 +114,7 @@ export class CreateGameDialogComponent {
                 this.GetExistingPlayerInfo(this.game.playerInfo, 'onlineCoop')
             ),
         });
+        this.title = this.updating ? 'Update Game' : 'Create Game';
     }
 
     modifyGameTag(name: string, event: MatChipSelectionChange) {
@@ -162,7 +165,7 @@ export class CreateGameDialogComponent {
         this.game.id = data.id;
         this.game.data.name = data.title;
         this.game.data.desc = data.description;
-        if (data.releaseDate instanceof Date) {
+        if (data.releaseDate instanceof Date && !isNaN(data.releaseDate)) {
             this.game.data.releaseDate = data.releaseDate
                 .toISOString()
                 .split('T')[0];
@@ -172,46 +175,66 @@ export class CreateGameDialogComponent {
 
     private applyPlayerTypeChanges() {
         this.game.playerInfo = [];
-        if (this.playerInfoTags.value.singlePlayer) {
+        if (this.playerInfoTags?.controls['singlePlayer'].value) {
             this.game.playerInfo.push({
                 playerType: 'singlePlayer',
                 minPlayers: 1,
                 maxPlayers: 1,
             });
         }
-        if (this.playerInfoTags.value.localMulti?.enabled) {
+        if (this.LocalPlayerTypeEnabled('localMultiplayer')) {
             this.game.playerInfo.push({
                 playerType: 'localMultiplayer',
-                minPlayers: this.playerInfoTags.value.localMulti.minPlayers!,
-                maxPlayers: this.playerInfoTags.value.localMulti.maxPlayers!,
+                minPlayers: this.LocalPlayerType(
+                    'localMultiplayer',
+                    'minPlayers'
+                ).value,
+                maxPlayers: this.LocalPlayerType(
+                    'localMultiplayer',
+                    'maxPlayers'
+                ).value,
             });
         }
-        if (this.playerInfoTags.value.localCoop?.enabled) {
+        if (this.LocalPlayerTypeEnabled('localCoop')) {
             this.game.playerInfo.push({
                 playerType: 'localCoop',
-                minPlayers: this.playerInfoTags.value.localCoop.minPlayers!,
-                maxPlayers: this.playerInfoTags.value.localCoop.maxPlayers!,
+                minPlayers: this.LocalPlayerType('localCoop', 'minPlayers')
+                    .value,
+                maxPlayers: this.LocalPlayerType('localCoop', 'maxPlayers')
+                    .value,
             });
         }
-        if (this.playerInfoTags.value.onlineMulti?.enabled) {
+        if (this.LocalPlayerTypeEnabled('onlineMultiplayer')) {
             this.game.playerInfo.push({
                 playerType: 'onlineMultiplayer',
-                minPlayers: this.playerInfoTags.value.onlineMulti.minPlayers!,
-                maxPlayers: this.playerInfoTags.value.onlineMulti.maxPlayers!,
+                minPlayers: this.LocalPlayerType(
+                    'onlineMultiplayer',
+                    'minPlayers'
+                ).value,
+                maxPlayers: this.LocalPlayerType(
+                    'onlineMultiplayer',
+                    'maxPlayers'
+                ).value,
             });
         }
-        if (this.playerInfoTags.value.onlineCoop?.enabled) {
+        if (this.LocalPlayerTypeEnabled('onlineCoop')) {
             this.game.playerInfo.push({
                 playerType: 'onlineCoop',
-                minPlayers: this.playerInfoTags.value.onlineCoop.minPlayers!,
-                maxPlayers: this.playerInfoTags.value.onlineCoop.maxPlayers!,
+                minPlayers: this.LocalPlayerType('onlineCoop', 'minPlayers')
+                    .value,
+                maxPlayers: this.LocalPlayerType('onlineCoop', 'maxPlayers')
+                    .value,
             });
         }
     }
 
-    LocalPlayerTypeEnabled(playerType: string): boolean {
+    private LocalPlayerType(playerType: string, info: string) {
         return (this.playerInfoTags?.controls[playerType] as FormGroup)
-            ?.controls['enabled'].value;
+            ?.controls[info];
+    }
+
+    LocalPlayerTypeEnabled(playerType: string): boolean {
+        return this.LocalPlayerType(playerType, 'enabled').value;
     }
 
     GetExistingPlayerInfo(infos: GamePlayerInfo[], playerType: string) {

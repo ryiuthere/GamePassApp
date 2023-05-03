@@ -51,14 +51,24 @@ export class AppComponent {
     }
 
     addGame(game: Game) {
-        this.gamedataService.addGame(game).pipe(take(1)).subscribe();
-        this.getGames();
+        this.gamedataService
+            .addGame(game)
+            .pipe(take(1))
+            .subscribe({
+                next: (_) => this.getGames(),
+                error: (_) => alert('Something went wrong.'),
+            });
     }
 
     updateGame(game: Game) {
         console.log(JSON.stringify(game));
-        this.gamedataService.updateGame(game).pipe(take(1)).subscribe();
-        this.getGames();
+        this.gamedataService
+            .updateGame(game)
+            .pipe(take(1))
+            .subscribe({
+                next: (_) => this.getGames(),
+                error: (_) => alert('Something went wrong.'),
+            });
     }
 
     removeSelectedGame() {

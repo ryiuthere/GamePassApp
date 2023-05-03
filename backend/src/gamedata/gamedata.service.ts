@@ -119,44 +119,13 @@ export class GamedataService {
             .where(GameTableId.id, game.id)
             .update({ ...gameData });
 
-        for (let [_, value] of Object.entries(PlayerTypes)) {
-            let updateEntryIndex = game.playerInfo.findIndex(
-                (info) => info.playerType == value,
-            );
-
-            if (updateEntryIndex !== -1) {
-                let info = game.playerInfo[updateEntryIndex];
-                this.knex(this.PLAYER_COUNT_TABLE_NAME)
-                    .where(PlayerTableId.id, game.id)
-                    .where(PlayerTableId.playerType, info.playerType)
-                    .then((rows) => {
-                        const playerInfo = { id: game.id, ...info };
-                        if (rows.length == 0) {
-                            // If exists in update list but not db, add to db
-                            return this.knex(
-                                this.PLAYER_COUNT_TABLE_NAME,
-                            ).insert({
-                                ...playerInfo,
-                            });
-                        } else {
-                            // If exists in both, update row
-                            this.knex(this.PLAYER_COUNT_TABLE_NAME)
-                                .where(PlayerTableId.id, game.id)
-                                .where(
-                                    PlayerTableId.playerType,
-                                    info.playerType,
-                                )
-                                .update({ ...playerInfo });
-                        }
-                    });
-            } else {
-                // If exists in db but not update list, del from db
-                await this.knex(this.PLAYER_COUNT_TABLE_NAME)
-                    .where(PlayerTableId.id, game.id)
-                    .where(PlayerTableId.playerType, value)
-                    .del();
-            }
-        }
+        await this.knex(this.PLAYER_COUNT_TABLE_NAME)
+            .where(PlayerTableId.id, game.id)
+            .del();
+        game.playerInfo.forEach((playerInfo) => {
+            (playerInfo as any).id = game.id;
+        });
+        await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(game.playerInfo);
     }
 
     async removeGameAsync(id: string) {
@@ -196,7 +165,7 @@ export class GamedataService {
             await this.knex.schema.createTable(
                 this.GAMEDATA_TABLE_NAME,
                 (table) => {
-                    table.string(GameTableId.id);
+                    table.string(GameTableId.id).primary();
                     table.string(GameTableId.name);
                     table.string(GameTableId.description, 2500);
                     table.string(GameTableId.releaseDate);
@@ -218,6 +187,7 @@ export class GamedataService {
             await this.knex.schema.createTable(
                 this.PLAYER_COUNT_TABLE_NAME,
                 (table) => {
+                    table.primary([PlayerTableId.id, PlayerTableId.playerType]);
                     table.string(PlayerTableId.id);
                     table.string(PlayerTableId.playerType);
                     table.string(PlayerTableId.minPlayers);

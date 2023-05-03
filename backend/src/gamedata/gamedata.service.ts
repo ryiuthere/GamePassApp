@@ -1,6 +1,7 @@
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { Game } from './gamedata.model';
+import { InternalServerErrorException } from '@nestjs/common';
 
 const knexNest = require('knexnest');
 
@@ -20,6 +21,7 @@ enum GameTableId {
 }
 
 enum PlayerTableId {
+    internalId = 'internalId',
     id = 'id',
     playerType = 'playerType',
     minPlayers = 'minPlayers',
@@ -42,18 +44,21 @@ export class GamedataService {
 
     async addGameAsync(game: Game) {
         await this.verifyTablesAsync();
+        if (!this.isValid(game)) {
+            throw new InternalServerErrorException('Incorrect formatting');
+        }
         // Each table requires the id as well
-        const gameData = { id: game.id, ...game.data };
+        let gameData = { id: game.id, ...game.data };
         await this.knex(this.GAMEDATA_TABLE_NAME).insert(gameData);
         await game.playerInfo.forEach(async (info) => {
-            const playerInfo = { id: game.id, ...info };
+            let playerInfo = { id: game.id, ...info };
             await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(playerInfo);
         });
     }
 
     async getGamesAsync(filters): Promise<Game[]> {
         await this.verifyTablesAsync();
-        const gamesQuery = this.knex
+        let gamesQuery = this.knex
             .select(
                 `g.${GameTableId.id} AS _${GameTableId.id}`,
                 `g.${GameTableId.name} AS _data_${GameTableId.name}`,
@@ -67,6 +72,9 @@ export class GamedataService {
                 `g.${GameTableId.crossplatMultiplayer} AS _data_${GameTableId.crossplatMultiplayer}`,
                 `g.${GameTableId.crossplatCoop} AS _data_${GameTableId.crossplatCoop}`,
                 `g.${GameTableId.favorite} AS _data_${GameTableId.favorite}`,
+                `p.${PlayerTableId.internalId} AS _${'playerInfo'}__${
+                    PlayerTableId.internalId
+                }`,
                 `p.${PlayerTableId.playerType} AS _${'playerInfo'}__${
                     PlayerTableId.playerType
                 }`,
@@ -87,7 +95,7 @@ export class GamedataService {
         // Allows for properly filtering by player type
         // Can not currently filter min and max players
         if (filters?.playerType) {
-            const innerQuery = this.knex
+            let innerQuery = this.knex
                 .select(PlayerTableId.id)
                 .from(this.PLAYER_COUNT_TABLE_NAME)
                 .where(PlayerTableId.playerType, filters.playerType);
@@ -100,7 +108,7 @@ export class GamedataService {
                 )
                 .whereNotNull(`pt.${PlayerTableId.id}`);
         }
-        for (const [key, value] of Object.entries(filters)) {
+        for (let [key, value] of Object.entries(filters)) {
             if (key == 'NAME') {
                 gamesQuery.whereILike(`g.${GameTableId[key]}`, `%${value}%`);
             } else if (key in GameTableId) {
@@ -114,7 +122,7 @@ export class GamedataService {
     async updateGameAsync(game: Game) {
         await this.verifyTablesAsync();
         // Each table requires the id as well
-        const gameData = { id: game.id, ...game.data };
+        let gameData = { id: game.id, ...game.data };
         await this.knex(this.GAMEDATA_TABLE_NAME)
             .where(GameTableId.id, game.id)
             .update({ ...gameData });
@@ -158,7 +166,7 @@ export class GamedataService {
     // Used to verify tables exist and create them if not
     // TODO: Migration
     private async verifyTablesAsync() {
-        const gameTableExists = await this.knex.schema.hasTable(
+        let gameTableExists = await this.knex.schema.hasTable(
             this.GAMEDATA_TABLE_NAME,
         );
         if (!gameTableExists) {
@@ -180,7 +188,7 @@ export class GamedataService {
                 },
             );
         }
-        const playerTypeTableExists = await this.knex.schema.hasTable(
+        let playerTypeTableExists = await this.knex.schema.hasTable(
             this.PLAYER_COUNT_TABLE_NAME,
         );
         if (!playerTypeTableExists) {
@@ -188,6 +196,7 @@ export class GamedataService {
                 this.PLAYER_COUNT_TABLE_NAME,
                 (table) => {
                     table.primary([PlayerTableId.id, PlayerTableId.playerType]);
+                    table.increments(PlayerTableId.internalId);
                     table.string(PlayerTableId.id);
                     table.string(PlayerTableId.playerType);
                     table.string(PlayerTableId.minPlayers);
@@ -197,5 +206,10 @@ export class GamedataService {
         }
     }
 
+    private isValid(game: Game) {
+        var idRegex = /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g;
+        var titleRegex = /[~!#$%\^&*+=\-\[\]\\;/{}|<>\?]/g;
+        return !idRegex.test(game.id) || titleRegex.test(game.data.name);
+    }
     //#endregion
 }

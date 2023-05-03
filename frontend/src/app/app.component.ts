@@ -56,7 +56,10 @@ export class AppComponent {
             .addGame(game)
             .pipe(take(1))
             .subscribe({
-                next: (_) => this.getGames(),
+                next: (_) => {
+                    this.getGames();
+                    this.updateSelectedGame(null);
+                },
                 error: (_) => alert('Something went wrong.'),
             });
     }

@@ -44,20 +44,13 @@
                 <span class="transparent"
                     >released {{ (selectedGame?.data)!.releaseDate }}</span
                 >
-                <mat-list>
-                    <mat-list-item
+                <mat-chip-listbox>
+                    <mat-chip-option
                         *ngFor="let info of selectedGame?.playerInfo!"
                     >
-                        <button
-                            mat-stroked-button
-                            extended
-                            color="primary"
-                            class="tag"
-                        >
-                            {{ getFormattedInfo(info) }}
-                        </button>
-                    </mat-list-item>
-                </mat-list>
+                        {{ getFormattedInfo(info) }}
+                    </mat-chip-option>
+                </mat-chip-listbox>
                 <mat-divider></mat-divider>
             </mat-card-content>
             <mat-card-actions>

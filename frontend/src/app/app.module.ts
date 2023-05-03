@@ -17,6 +17,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CreateGameDialogModule } from './create-game/create-game-dialog.module';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
     declarations: [AppComponent],
@@ -36,6 +37,7 @@ import { CreateGameDialogModule } from './create-game/create-game-dialog.module'
         MatListModule,
         MatDialogModule,
         CreateGameDialogModule,
+        MatChipsModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

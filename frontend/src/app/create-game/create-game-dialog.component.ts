@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Game } from '../gamedata/gamedata.model';
+import { Game, GamePlayerInfo } from '../gamedata/gamedata.model';
 import {
     FormBuilder,
     FormControl,
@@ -9,6 +9,8 @@ import {
 } from '@angular/forms';
 import { takeWhile } from 'rxjs';
 import { MatChipSelectionChange } from '@angular/material/chips';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
 
 @Component({
     selector: 'create-game-dialog',
@@ -27,68 +29,89 @@ export class CreateGameDialogComponent {
         'Role Playing',
     ];
 
+    updating: boolean;
     modifyingGame: boolean;
     game: Game;
-    dialogDataForm: FormGroup;
-    gameDataTags: Map<string, boolean>;
-
-    playerInfoTags = this.formBuilder.group({
-        singlePlayer: false,
-        localMulti: this.formBuilder.group({
-            enabled: false,
-            minPlayers: 2,
-            maxPlayers: 2,
-        }),
-        localCoop: this.formBuilder.group({
-            enabled: false,
-            minPlayers: 2,
-            maxPlayers: 2,
-        }),
-        onlineMulti: this.formBuilder.group({
-            enabled: false,
-            minPlayers: 2,
-            maxPlayers: 2,
-        }),
-        onlineCoop: this.formBuilder.group({
-            enabled: false,
-            minPlayers: 2,
-            maxPlayers: 2,
-        }),
-    });
+    dialogDataForm!: FormGroup;
+    gameDataTags!: Map<string, boolean>;
+    playerInfoTags!: FormGroup;
 
     constructor(
+        @Inject(MAT_DIALOG_DATA) public data: any,
         private dialog: MatDialogRef<CreateGameDialogComponent>,
         private formBuilder: FormBuilder
     ) {
-        this.game = {
-            id: '',
-            data: {
-                name: '',
-                desc: '',
-                releaseDate: '',
-                seriesx: false,
-                xbone: false,
-                windows: false,
-                cloud: false,
-                genre: '',
-                crossplatMultiplayer: false,
-                crossplatCoop: false,
-                favorite: false,
-            },
-            playerInfo: [],
-        };
         this.modifyingGame = true;
+        if (data?.game) {
+            this.updating = true;
+            this.game = data.game;
+        } else {
+            this.updating = false;
+            this.game = {
+                id: '',
+                data: {
+                    name: '',
+                    desc: '',
+                    releaseDate: '',
+                    seriesx: false,
+                    xbone: false,
+                    windows: false,
+                    cloud: false,
+                    genre: '',
+                    crossplatMultiplayer: false,
+                    crossplatCoop: false,
+                    favorite: false,
+                },
+                playerInfo: [],
+            };
+        }
+    }
+
+    ngOnInit() {
         this.dialogDataForm = new FormGroup({
             id: new FormControl(this.game.id, [Validators.required]),
             title: new FormControl(this.game.data.name, [Validators.required]),
             description: new FormControl(this.game.data.desc),
-            releaseDate: new FormControl(Date, [Validators.required]),
+            releaseDate: new FormControl(new Date(this.game.data.releaseDate), [
+                Validators.required,
+            ]),
             genre: new FormControl(this.game.data.genre, [Validators.required]),
         });
         this.dialogDataForm.valueChanges
             .pipe(takeWhile(() => this.modifyingGame))
             .subscribe((data) => this.onDialogChange(data));
-        this.gameDataTags = new Map<string, boolean>();
+        this.gameDataTags = new Map<string, boolean>([
+            ['seriesx', this.game.data.seriesx],
+            ['xbone', this.game.data.xbone],
+            ['windows', this.game.data.windows],
+            ['cloud', this.game.data.cloud],
+            ['crossplatMultiplayer', this.game.data.crossplatMultiplayer],
+            ['crossplatCoop', this.game.data.crossplatCoop],
+        ]);
+        this.playerInfoTags = this.formBuilder.group({
+            singlePlayer: this.GetExistingPlayerInfo(
+                this.game.playerInfo,
+                'singlePlayer'
+            ).enabled,
+            localMultiplayer: this.formBuilder.group(
+                this.GetExistingPlayerInfo(
+                    this.game.playerInfo,
+                    'localMultiplayer'
+                )
+            ),
+            localCoop: this.formBuilder.group(
+                this.GetExistingPlayerInfo(this.game.playerInfo, 'localCoop')
+            ),
+            onlineMultiplayer: this.formBuilder.group(
+                this.GetExistingPlayerInfo(
+                    this.game.playerInfo,
+                    'onlineMultiplayer'
+                )
+            ),
+            onlineCoop: this.formBuilder.group(
+                this.GetExistingPlayerInfo(this.game.playerInfo, 'onlineCoop')
+            ),
+        });
     }
 
     modifyGameTag(name: string, event: MatChipSelectionChange) {
@@ -148,6 +171,7 @@ export class CreateGameDialogComponent {
     }
 
     private applyPlayerTypeChanges() {
+        this.game.playerInfo = [];
         if (this.playerInfoTags.value.singlePlayer) {
             this.game.playerInfo.push({
                 playerType: 'singlePlayer',
@@ -183,5 +207,28 @@ export class CreateGameDialogComponent {
                 maxPlayers: this.playerInfoTags.value.onlineCoop.maxPlayers!,
             });
         }
+    }
+
+    LocalPlayerTypeEnabled(playerType: string): boolean {
+        return (this.playerInfoTags?.controls[playerType] as FormGroup)
+            ?.controls['enabled'].value;
+    }
+
+    GetExistingPlayerInfo(infos: GamePlayerInfo[], playerType: string) {
+        let info = { enabled: false, minPlayers: 2, maxPlayers: 2 };
+        var relevantInfos = infos.filter(
+            (info) => info.playerType === playerType
+        );
+
+        if (relevantInfos.length !== 0) {
+            info.enabled = true;
+            info.minPlayers = relevantInfos[0].minPlayers;
+            info.maxPlayers = relevantInfos[0].maxPlayers;
+        }
+
+        console.log(
+            'Existing info? ' + playerType + ' : ' + JSON.stringify(info)
+        );
+        return info;
     }
 }

@@ -3,7 +3,7 @@
     <div class="dialog-container">
         <form [formGroup]="dialogDataForm">
             <table class="full-width" cellspacing="0">
-                <td>
+                <td *ngIf="!updating">
                     <mat-form-field appearance="fill" class="full-width">
                         <mat-label>ID</mat-label>
                         <input
@@ -73,28 +73,34 @@
         <div>
             <mat-chip-listbox selectable multiple>
                 <mat-chip-option
+                    [selected]="this.gameDataTags.get('seriesx')"
                     (selectionChange)="modifyGameTag('seriesx', $event)"
                     >Series X</mat-chip-option
                 >
                 <mat-chip-option
+                    [selected]="this.gameDataTags.get('xbone')"
                     (selectionChange)="modifyGameTag('xbone', $event)"
                     >Xbox One</mat-chip-option
                 >
                 <mat-chip-option
+                    [selected]="this.gameDataTags.get('windows')"
                     (selectionChange)="modifyGameTag('windows', $event)"
                     >Windows</mat-chip-option
                 >
                 <mat-chip-option
+                    [selected]="this.gameDataTags.get('cloud')"
                     (selectionChange)="modifyGameTag('cloud', $event)"
                     >Cloud</mat-chip-option
                 >
                 <mat-chip-option
+                    [selected]="this.gameDataTags.get('crossplatMultiplayer')"
                     (selectionChange)="
                         modifyGameTag('crossplatMultiplayer', $event)
                     "
                     >Cross-Platform Multiplayer</mat-chip-option
                 >
                 <mat-chip-option
+                    [selected]="this.gameDataTags.get('crossplatCoop')"
                     (selectionChange)="modifyGameTag('crossplatCoop', $event)"
                     >Cross-Platform Co-op</mat-chip-option
                 >
@@ -111,14 +117,13 @@
                 </mat-expansion-panel-header>
             </mat-expansion-panel>
             <mat-expansion-panel
-                #localMulti
+                #localMultiPanel
                 disabled
-                formGroupName="localMulti"
+                formGroupName="localMultiplayer"
+                [expanded]="LocalPlayerTypeEnabled('localMultiplayer')"
             >
                 <mat-expansion-panel-header>
-                    <mat-checkbox
-                        formControlName="enabled"
-                        (change)="localMulti.toggle()"
+                    <mat-checkbox formControlName="enabled"
                         >Local Multiplayer</mat-checkbox
                     >
                 </mat-expansion-panel-header>
@@ -145,11 +150,14 @@
                     </td>
                 </table>
             </mat-expansion-panel>
-            <mat-expansion-panel #localCoop disabled formGroupName="localCoop">
+            <mat-expansion-panel
+                #localCoopPanel
+                disabled
+                formGroupName="localCoop"
+                [expanded]="LocalPlayerTypeEnabled('localCoop')"
+            >
                 <mat-expansion-panel-header>
-                    <mat-checkbox
-                        formControlName="enabled"
-                        (change)="localCoop.toggle()"
+                    <mat-checkbox formControlName="enabled"
                         >Local Coop</mat-checkbox
                     >
                 </mat-expansion-panel-header>
@@ -177,14 +185,13 @@
                 </table>
             </mat-expansion-panel>
             <mat-expansion-panel
-                #onlineMulti
+                #onlineMultiPanel
                 disabled
-                formGroupName="onlineMulti"
+                formGroupName="onlineMultiplayer"
+                [expanded]="LocalPlayerTypeEnabled('onlineMultiplayer')"
             >
                 <mat-expansion-panel-header>
-                    <mat-checkbox
-                        formControlName="enabled"
-                        (change)="onlineMulti.toggle()"
+                    <mat-checkbox formControlName="enabled"
                         >Online Multiplayer</mat-checkbox
                     >
                 </mat-expansion-panel-header>
@@ -212,14 +219,13 @@
                 </table>
             </mat-expansion-panel>
             <mat-expansion-panel
-                #onlineCoop
+                #onlineCoopPanel
                 disabled
                 formGroupName="onlineCoop"
+                [expanded]="LocalPlayerTypeEnabled('onlineCoop')"
             >
                 <mat-expansion-panel-header>
-                    <mat-checkbox
-                        formControlName="enabled"
-                        (change)="onlineCoop.toggle()"
+                    <mat-checkbox formControlName="enabled"
                         >Online Coop</mat-checkbox
                     >
                 </mat-expansion-panel-header>

@@ -16,12 +16,14 @@ export class AppComponent {
     selectedGame: Game | null;
     @ViewChild('sidenav', { read: MatSidenav })
     sideNav!: MatSidenav;
+    filters: { filterName: string; value: string }[];
     constructor(
         public dialog: MatDialog,
         private gamedataService: GamedataService
     ) {
         this.games = [];
         this.selectedGame = null;
+        this.filters = [];
     }
 
     ngOnInit() {
@@ -29,27 +31,51 @@ export class AppComponent {
     }
 
     getAllGames() {
+        this.getGames();
+    }
+
+    getGames(filters?: { filterName: string; value: string }[]) {
+        if (filters) {
+            this.filters = filters;
+        }
+
         this.gamedataService
-            .getGames()
+            .getGames(this.filters)
             .pipe(take(1))
             .subscribe((data) => {
                 this.games = data as Game[];
+                this.games = this.games.sort((a, b) =>
+                    a.data.name.localeCompare(b.data.name)
+                );
             });
-    }
-
-    getGames(filters: { filterName: string; value: string }[]) {
-        this.gamedataService
-            .getGames(filters)
-            .pipe(take(1))
-            .subscribe((data) => (this.games = data as Game[]));
     }
 
     addGame(game: Game) {
         this.gamedataService.addGame(game).pipe(take(1)).subscribe();
+        this.getGames();
+    }
+
+    updateGame(game: Game) {
+        console.log(JSON.stringify(game));
+        this.gamedataService.updateGame(game).pipe(take(1)).subscribe();
+        this.getGames();
+    }
+
+    removeSelectedGame() {
+        if (!this.selectedGame) return;
+
+        this.gamedataService
+            .deleteGame(this.selectedGame.id)
+            .pipe(take(1))
+            .subscribe();
+        this.games = this.games.filter((g) => g.id !== this.selectedGame!.id);
+        this.updateSelectedGame(null);
     }
 
     openCreateGameDialog() {
-        const dialogRef = this.dialog.open(CreateGameDialogComponent);
+        const dialogRef = this.dialog.open(CreateGameDialogComponent, {
+            data: { game: null },
+        });
 
         dialogRef
             .afterClosed()
@@ -57,7 +83,22 @@ export class AppComponent {
             .subscribe((result) => {
                 if (result) {
                     this.addGame(result);
-                    this.games.push(result);
+                }
+            });
+    }
+
+    updateGameDialog() {
+        if (!this.selectedGame) return;
+
+        const dialogRef = this.dialog.open(CreateGameDialogComponent, {
+            data: { game: this.selectedGame },
+        });
+        dialogRef
+            .afterClosed()
+            .pipe(take(1))
+            .subscribe((result) => {
+                if (result) {
+                    this.updateGame(result);
                 }
             });
     }

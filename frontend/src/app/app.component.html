@@ -2,7 +2,7 @@
     <mat-expansion-panel>
         <mat-expansion-panel-header>
             <mat-panel-title class="title"> Games Library </mat-panel-title>
-            <span class="header-spacer"></span>
+            <span class="spacer"></span>
             <button
                 mat-icon-button
                 aria-label="Example icon-button with menu icon"
@@ -74,6 +74,20 @@
                             ? "Favorited"
                             : "Add to favorites"
                     }}
+                </button>
+                <button mat-button (click)="updateGameDialog()" color="basic">
+                    <mat-icon>settings</mat-icon>
+                    Modify
+                </button>
+                <span class="spacer"></span>
+                <button
+                    mat-button
+                    (click)="removeSelectedGame()"
+                    color="warn"
+                    class="delete-button"
+                >
+                    <mat-icon>delete</mat-icon>
+                    Delete
                 </button>
             </mat-card-actions>
         </mat-card>

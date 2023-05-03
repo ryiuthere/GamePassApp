@@ -20,7 +20,7 @@
     height: auto;
 }
 
-.header-spacer {
+.spacer {
     flex: 1 1 auto;
 }
 
@@ -47,4 +47,8 @@
 
 .transparent {
     opacity: 0.5;
+}
+
+.delete-button {
+    float: right;
 }

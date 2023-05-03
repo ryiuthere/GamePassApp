@@ -31,6 +31,6 @@ export class GamedataService {
     }
 
     private GetPath(path?: string) {
-        return path ? `${this.host}/path` : `${this.host}`;
+        return path ? `${this.host}/${path}` : `${this.host}`;
     }
 }

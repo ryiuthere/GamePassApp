@@ -26,6 +26,14 @@ enum PlayerTableId {
     maxPlayers = 'maxPlayers',
 }
 
+enum PlayerTypes {
+    singlePlayer = 'singlePlayer',
+    localMultiplayer = 'localMultiplayer',
+    localCoop = 'localCoop',
+    onlineMultiplayer = 'onlineMultiplayer',
+    onlineCoop = 'onlineCoop',
+}
+
 export class GamedataService {
     private readonly GAMEDATA_TABLE_NAME = 'gamedata_info';
     private readonly PLAYER_COUNT_TABLE_NAME = 'gamedata_player_count_info';
@@ -110,12 +118,45 @@ export class GamedataService {
         await this.knex(this.GAMEDATA_TABLE_NAME)
             .where(GameTableId.id, game.id)
             .update({ ...gameData });
-        await game.playerInfo.forEach(async (info) => {
-            const playerInfo = { id: game.id, ...info };
-            await this.knex(this.PLAYER_COUNT_TABLE_NAME)
-                .where(PlayerTableId.id, game.id)
-                .update({ ...playerInfo });
-        });
+
+        for (let [_, value] of Object.entries(PlayerTypes)) {
+            let updateEntryIndex = game.playerInfo.findIndex(
+                (info) => info.playerType == value,
+            );
+
+            if (updateEntryIndex !== -1) {
+                let info = game.playerInfo[updateEntryIndex];
+                this.knex(this.PLAYER_COUNT_TABLE_NAME)
+                    .where(PlayerTableId.id, game.id)
+                    .where(PlayerTableId.playerType, info.playerType)
+                    .then((rows) => {
+                        const playerInfo = { id: game.id, ...info };
+                        if (rows.length == 0) {
+                            // If exists in update list but not db, add to db
+                            return this.knex(
+                                this.PLAYER_COUNT_TABLE_NAME,
+                            ).insert({
+                                ...playerInfo,
+                            });
+                        } else {
+                            // If exists in both, update row
+                            this.knex(this.PLAYER_COUNT_TABLE_NAME)
+                                .where(PlayerTableId.id, game.id)
+                                .where(
+                                    PlayerTableId.playerType,
+                                    info.playerType,
+                                )
+                                .update({ ...playerInfo });
+                        }
+                    });
+            } else {
+                // If exists in db but not update list, del from db
+                await this.knex(this.PLAYER_COUNT_TABLE_NAME)
+                    .where(PlayerTableId.id, game.id)
+                    .where(PlayerTableId.playerType, value)
+                    .del();
+            }
+        }
     }
 
     async removeGameAsync(id: string) {

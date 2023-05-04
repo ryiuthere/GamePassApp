@@ -50,10 +50,10 @@ export class GamedataService {
         // Each table requires the id as well
         let gameData = { id: game.id, ...game.data };
         await this.knex(this.GAMEDATA_TABLE_NAME).insert(gameData);
-        await game.playerInfo.forEach(async (info) => {
-            let playerInfo = { id: game.id, ...info };
-            await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(playerInfo);
+        game.playerInfo.forEach((playerInfo) => {
+            (playerInfo as any).id = game.id;
         });
+        await this.knex(this.PLAYER_COUNT_TABLE_NAME).insert(game.playerInfo);
     }
 
     async getGamesAsync(filters): Promise<Game[]> {
